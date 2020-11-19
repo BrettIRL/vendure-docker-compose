@@ -1,0 +1,33 @@
+version: '3'
+services:
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+  backend:
+    build: .
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes: 
+      - /usr/src/app
+    env_file: .env
+    depends_on: 
+      - database
+  database:
+    image: postgres
+    restart: unless-stopped
+    volumes: 
+      - /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file: .env
+volumes:
+  caddy_data:
+  caddy_config:
